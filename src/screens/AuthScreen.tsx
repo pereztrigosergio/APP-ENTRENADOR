@@ -7,6 +7,8 @@ export default function AuthScreen() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
+  const [show, setShow] = useState(false)
   const [role, setRole] = useState<Role>('client')
   const [error, setError] = useState<string | null>(null)
   const [info, setInfo] = useState<string | null>(null)
@@ -19,7 +21,7 @@ export default function AuthScreen() {
     setBusy(true)
     try {
       if (mode === 'signup') {
-        const problem = validateRegistration({ name, email, password, role })
+        const problem = validateRegistration({ name, email, password, confirm, role })
         if (problem) return setError(problem)
         const { data, error: err } = await supabase.auth.signUp({
           email: email.trim(),
@@ -66,9 +68,19 @@ export default function AuthScreen() {
           <input type="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" />
         </label>
         <label>Contraseña
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)}
-            autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} />
+          <span className="pwd">
+            <input type={show ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)}
+              autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} />
+            <button type="button" className="small" aria-pressed={show} onClick={() => setShow(!show)}>
+              {show ? 'Ocultar' : 'Mostrar'}
+            </button>
+          </span>
         </label>
+        {mode === 'signup' && (
+          <label>Repite la contraseña
+            <input type={show ? 'text' : 'password'} value={confirm} onChange={e => setConfirm(e.target.value)} autoComplete="new-password" />
+          </label>
+        )}
         {error && <p className="msg error" role="alert">{error}</p>}
         {info && <p className="msg info">{info}</p>}
         <button className="primary" disabled={busy}>{mode === 'signup' ? 'Crear cuenta' : 'Entrar'}</button>

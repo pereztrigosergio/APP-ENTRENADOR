@@ -66,3 +66,5 @@ input:focus-visible, button:focus-visible { outline: 3px solid var(--brand); out
 .share input { width: 20px; height: 20px; accent-color: var(--brand); }
 textarea { font: inherit; padding: 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); resize: vertical; }
 .primary.wide { width: 100%; margin-top: 20px; }
+.pwd { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: stretch; }
+.pwd .small { min-width: 84px; }
