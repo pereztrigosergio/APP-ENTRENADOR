@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { myClients, removeLink, requestClient } from '../lib/api'
+import ConfirmDialog, { type Ask } from '../components/ConfirmDialog'
 import { ageFromBirthDate, EXPERIENCE, GOALS, normalizePublicId, type ClientRow } from '../lib/helpers'
 
 function SharedData({ r }: { r: ClientRow }) {
@@ -21,7 +22,7 @@ export default function ClientsScreen() {
   const [rows, setRows] = useState<ClientRow[] | null>(null)
   const [idInput, setIdInput] = useState('')
   const [msg, setMsg] = useState<{ kind: 'error' | 'info'; text: string } | null>(null)
-  const [busy, setBusy] = useState(false)
+  const [ask, setAsk] = useState<Ask | null>(null)
 
   const load = useCallback(async () => {
     try {
@@ -33,29 +34,40 @@ export default function ClientsScreen() {
 
   useEffect(() => { void load() }, [load])
 
-  async function send(e: React.FormEvent) {
+  function send(e: React.FormEvent) {
     e.preventDefault()
     setMsg(null)
     const id = normalizePublicId(idInput)
     if (!id) return setMsg({ kind: 'error', text: 'ID no válido. Tiene este formato: #A7K29' })
-    setBusy(true)
-    try {
-      await requestClient(id)
-      setIdInput('')
-      setMsg({ kind: 'info', text: 'Solicitud enviada. El cliente tiene que aceptarla.' })
-      await load()
-    } catch (err) {
-      setMsg({ kind: 'error', text: (err as Error).message })
-    } finally {
-      setBusy(false)
-    }
+    setAsk({
+      title: '¿Enviar solicitud?',
+      text: 'Se la enviarás al cliente con el ID ' + id + '. Tendrá que aceptarla para que sea tu cliente.',
+      confirmLabel: 'Enviar solicitud',
+      run: async () => {
+        await requestClient(id)
+        setIdInput('')
+        setMsg({ kind: 'info', text: 'Solicitud enviada. El cliente tiene que aceptarla.' })
+      }
+    })
   }
 
-  async function remove(r: ClientRow) {
-    const text = r.status === 'pending' ? '¿Cancelar la solicitud a ' : '¿Quitar a '
-    if (!window.confirm(text + r.name + '?')) return
+  function remove(r: ClientRow) {
+    const pending = r.status === 'pending'
+    setAsk({
+      title: pending ? '¿Cancelar la solicitud?' : '¿Quitar cliente?',
+      text: pending ? 'Se cancelará la solicitud enviada a ' + r.name + '.' : 'Dejarás de entrenar a ' + r.name + ' y no verás sus datos.',
+      confirmLabel: pending ? 'Cancelar solicitud' : 'Quitar cliente',
+      danger: true,
+      run: () => removeLink(r.link_id)
+    })
+  }
+
+  async function confirm() {
+    if (!ask) return
+    const current = ask
+    setAsk(null)
     try {
-      await removeLink(r.link_id)
+      await current.run()
       await load()
     } catch (err) {
       setMsg({ kind: 'error', text: (err as Error).message })
@@ -69,7 +81,7 @@ export default function ClientsScreen() {
         <label>ID del cliente
           <input value={idInput} onChange={e => setIdInput(e.target.value)} placeholder="#A7K29" autoCapitalize="characters" autoComplete="off" />
         </label>
-        <button className="primary" disabled={busy}>Enviar solicitud</button>
+        <button className="primary">Enviar solicitud</button>
       </form>
       {msg && <p className={'msg ' + msg.kind} role={msg.kind === 'error' ? 'alert' : undefined}>{msg.text}</p>}
 
@@ -83,6 +95,7 @@ export default function ClientsScreen() {
           </div>
         ))}
       </section>
+      {ask && <ConfirmDialog ask={ask} onConfirm={confirm} onCancel={() => setAsk(null)} />}
     </>
   )
 }

@@ -68,3 +68,8 @@ textarea { font: inherit; padding: 12px; border: 1.5px solid var(--line); border
 .primary.wide { width: 100%; margin-top: 20px; }
 .pwd { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: stretch; }
 .pwd .small { min-width: 84px; }
+.overlay { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 20px; background: rgba(0, 0, 0, 0.5); }
+.dialog { width: 100%; max-width: 380px; padding: 20px; border-radius: 14px; background: var(--surface); color: var(--ink); display: grid; gap: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
+.dialog h2 { margin: 0; font-size: 1.15rem; }
+.dialog p { margin: 0; color: var(--muted); }
+.actions.end { justify-content: flex-end; }
