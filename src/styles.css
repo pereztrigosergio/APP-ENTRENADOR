@@ -34,6 +34,35 @@ input:focus-visible, button:focus-visible { outline: 3px solid var(--brand); out
 .idcard { display: grid; gap: 6px; justify-items: start; padding: 20px; background: var(--tag); color: var(--tag-ink); border-radius: 14px; }
 .idlabel { font-size: 0.9rem; font-weight: 600; }
 .idvalue { font-size: 2.6rem; font-weight: 800; letter-spacing: 0.06em; font-variant-numeric: tabular-nums; }
-.idcard button { margin-top: 6px; padding: 8px 14px; font: inherit; font-weight: 600; border: 2px solid var(--tag-ink); border-radius: 8px; background: transparent; color: var(--tag-ink); cursor: pointer; }
+.idcard button { margin-top: 6px; padding: 8px 14px; font: inherit; font-weight: 600; border: 2px solid currentColor; border-radius: 8px; background: transparent; color: var(--tag-ink); cursor: pointer; }
 .hint { color: var(--muted); margin: 14px 0 0; }
 .link { margin-top: 32px; background: none; border: 0; padding: 8px 0; font: inherit; color: var(--muted); text-decoration: underline; cursor: pointer; }
+.idcard.client { background: #8ec5ff; color: #0b2545; }
+.screen.with-tabs { padding-bottom: calc(env(safe-area-inset-bottom) + 96px); }
+.tabbar { position: fixed; left: 0; right: 0; bottom: 0; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; background: var(--surface); border-top: 1.5px solid var(--line); padding-bottom: env(safe-area-inset-bottom); }
+.tabbar button { background: none; border: 0; padding: 16px 8px; font: inherit; color: var(--muted); cursor: pointer; border-top: 3px solid transparent; margin-top: -1.5px; }
+.tabbar button[aria-current="page"] { color: var(--ink); font-weight: 700; border-top-color: var(--brand); }
+.block { margin-top: 20px; display: grid; gap: 12px; }
+.card { padding: 16px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--surface); display: grid; gap: 8px; justify-items: start; }
+.card-title { margin: 0; font-size: 0.9rem; color: var(--muted); }
+.card-main { margin: 0; font-weight: 700; }
+.muted { color: var(--muted); font-weight: 500; }
+.chip { margin: 0; padding: 4px 10px; border-radius: 999px; background: var(--line); font-size: 0.85rem; }
+.actions { display: flex; gap: 8px; }
+.small { padding: 8px 14px; font: inherit; font-weight: 600; border: 1.5px solid var(--line); border-radius: 8px; background: transparent; color: var(--ink); cursor: pointer; }
+.small.primary { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
+.small.danger { color: var(--danger); border-color: var(--danger); }
+.addform { display: grid; gap: 12px; margin-bottom: 12px; }
+.data { margin: 0; display: grid; gap: 4px; width: 100%; }
+.data div { display: grid; grid-template-columns: 110px 1fr; gap: 8px; }
+.data dt { color: var(--muted); }
+.data dd { margin: 0; font-weight: 600; }
+.field { display: grid; gap: 10px; padding: 16px 0; border-bottom: 1.5px solid var(--line); }
+.label { margin: 0; font-weight: 600; font-size: 0.95rem; }
+.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.choices button { padding: 14px 10px; font: inherit; border: 1.5px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); cursor: pointer; }
+.choices button[aria-pressed="true"] { border-color: var(--brand); background: var(--brand); color: var(--brand-ink); font-weight: 700; }
+.share { display: flex; align-items: center; gap: 10px; font-weight: 500; color: var(--muted); }
+.share input { width: 20px; height: 20px; accent-color: var(--brand); }
+textarea { font: inherit; padding: 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); resize: vertical; }
+.primary.wide { width: 100%; margin-top: 20px; }
