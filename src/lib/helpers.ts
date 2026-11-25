@@ -61,7 +61,7 @@ export type Item = {
   item_variants: Variant[]
 }
 export type Session = { id: string; position: number; title: string; program_items: Item[] }
-export type Week = { id: string; week_number: number; program_sessions: Session[] }
+export type Week = { id: string; week_number: number; visible: boolean; program_sessions: Session[] }
 
 export const MUSCLE_GROUPS: Record<string, string> = {
   pierna: 'Pierna',
@@ -86,6 +86,80 @@ export function parseReps(input: string): string | null {
 
 export function describeItem(i: { sets: number; reps: string; weight_kg: number | null }): string {
   return i.sets + ' × ' + i.reps + (i.weight_kg !== null ? ' · ' + i.weight_kg + ' kg' : '')
+}
+
+// ---------- Vista del cliente ----------
+export type ProgItem = {
+  id: string
+  position: number
+  exercise_id: string
+  exercise_name: string
+  sets: number
+  reps: string
+  weight_kg: number | null
+  note: string | null
+  variants: { exercise_id: string; name: string }[]
+}
+export type ProgSession = { id: string; position: number; title: string; items: ProgItem[] }
+export type ProgWeek = { id: string; week_number: number; sessions: ProgSession[] }
+export type SessionLog = {
+  id: string
+  session_id: string
+  scheduled_date: string | null
+  status: 'planned' | 'done'
+  feeling: number | null
+  feeling_note: string | null
+}
+
+export type SetRow = {
+  item_id: string
+  exercise_id: string
+  set_number: number
+  prescribed_reps: string | null
+  prescribed_weight: number | null
+  reps_done: number | null
+  weight_done: number | null
+  done: boolean
+}
+export type UiRow = SetRow & { repsStr: string; weightStr: string }
+
+export const FEELINGS: [number, string, string][] = [
+  [1, '😣', 'Mal'], [2, '😕', 'Regular'], [3, '😐', 'Normal'], [4, '🙂', 'Bien'], [5, '😄', 'Genial']
+]
+
+/** Primer número de «8» o «8-10»; sirve para rellenar la serie con lo prescrito. */
+export function firstNumber(reps: string): number {
+  return parseInt(reps.split('-')[0], 10)
+}
+
+/** Una fila por serie, ya rellenada con lo prescrito. */
+export function buildSetRows(items: ProgItem[]): SetRow[] {
+  const rows: SetRow[] = []
+  for (const i of items) {
+    for (let n = 1; n <= i.sets; n++) {
+      rows.push({
+        item_id: i.id, exercise_id: i.exercise_id, set_number: n,
+        prescribed_reps: i.reps, prescribed_weight: i.weight_kg,
+        reps_done: firstNumber(i.reps), weight_done: i.weight_kg, done: false
+      })
+    }
+  }
+  return rows
+}
+
+export function toUi(r: SetRow): UiRow {
+  return { ...r, repsStr: r.reps_done === null ? '' : String(r.reps_done), weightStr: r.weight_done === null ? '' : String(r.weight_done) }
+}
+
+export function fromUi(r: UiRow): SetRow {
+  const reps = parseInt(r.repsStr, 10)
+  const weight = parseFloat(r.weightStr.replace(',', '.'))
+  const { repsStr: _a, weightStr: _b, ...rest } = r
+  return {
+    ...rest,
+    reps_done: Number.isNaN(reps) || reps < 0 ? null : reps,
+    weight_done: Number.isNaN(weight) || weight < 0 ? null : weight
+  }
 }
 
 const ERRORS: Record<string, string> = {

@@ -93,3 +93,17 @@ textarea { font: inherit; padding: 12px; border: 1.5px solid var(--line); border
 .trio { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 .trio input { width: 100%; min-width: 0; }
 select { font: inherit; padding: 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); }
+.datefield { display: grid; gap: 4px; font-size: 0.9rem; }
+.datefield input { padding: 8px 10px; }
+.setgrid { display: grid; gap: 8px; width: 100%; }
+.setgrid > span { display: none; }
+.setrow { display: grid; grid-template-columns: 64px 1fr 1fr 44px; gap: 8px; align-items: center; }
+.setrow input:not([type="checkbox"]) { width: 100%; min-width: 0; text-align: center; }
+.setrow input[type="checkbox"] { width: 28px; height: 28px; accent-color: var(--brand); justify-self: center; }
+.setrow .small { grid-column: 1 / -1; justify-self: start; }
+.setnum { display: grid; font-weight: 700; }
+.setnum small { color: var(--muted); font-weight: 500; font-size: 0.75rem; }
+.faces { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; width: 100%; }
+.faces button { display: grid; gap: 2px; justify-items: center; padding: 10px 2px; font: inherit; border: 1.5px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); cursor: pointer; }
+.faces button[aria-pressed="true"] { border-color: var(--brand); background: var(--brand); color: var(--brand-ink); font-weight: 700; }
+.face { font-size: 1.6rem; line-height: 1; }

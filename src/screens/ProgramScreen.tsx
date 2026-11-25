@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import {
-  addSession, copyWeek, createExercise, createWeek, deleteItem, deleteSession, deleteWeek,
+  addSession, setWeekVisible, copyWeek, createExercise, createWeek, deleteItem, deleteSession, deleteWeek,
   listExercises, loadWeeks, renameSession, saveItem
 } from '../lib/api'
 import { describeItem, type Exercise, type Item, type Week } from '../lib/helpers'
@@ -78,6 +78,9 @@ export default function ProgramScreen({ client, onBack }: { client: { id: string
       {week && (
         <>
           <div className="actions wrap">
+            <button className={'small ' + (week.visible ? 'primary' : '')} onClick={() => act(() => setWeekVisible(week.id, !week.visible))}>
+              {week.visible ? 'Visible para el cliente ✓' : 'Borrador · Mostrar al cliente'}
+            </button>
             <button className="small" onClick={() => act(() => copyWeek(week.id), r => r)}>Copiar a semana {nextNumber}</button>
             <button className="small danger" onClick={() => setAsk({
               title: '¿Borrar la semana ' + week.week_number + '?',

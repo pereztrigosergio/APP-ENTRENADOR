@@ -5,8 +5,9 @@ import ClientsScreen from './ClientsScreen'
 import MyDataScreen from './MyDataScreen'
 import ExercisesScreen from './ExercisesScreen'
 import ProgramScreen from './ProgramScreen'
+import TrainingScreen from './TrainingScreen'
 
-type Tab = 'inicio' | 'datos' | 'clientes' | 'ejercicios'
+type Tab = 'inicio' | 'datos' | 'clientes' | 'ejercicios' | 'entrenos'
 
 export default function Home({ userId }: { userId: string }) {
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -35,7 +36,7 @@ export default function Home({ userId }: { userId: string }) {
   const trainer = profile.role === 'trainer'
   const tabs: [Tab, string][] = trainer
     ? [['clientes', 'Clientes'], ['ejercicios', 'Ejercicios'], ['inicio', 'Perfil']]
-    : [['inicio', 'Inicio'], ['datos', 'Mis datos']]
+    : [['inicio', 'Inicio'], ['entrenos', 'Entrenos'], ['datos', 'Mis datos']]
   const active: Tab = tab ?? tabs[0][0]
 
   return (
@@ -45,6 +46,7 @@ export default function Home({ userId }: { userId: string }) {
         {active === 'clientes' && !program && <ClientsScreen onProgram={setProgram} />}
         {active === 'clientes' && program && <ProgramScreen client={program} onBack={() => setProgram(null)} />}
         {active === 'ejercicios' && <ExercisesScreen />}
+        {active === 'entrenos' && <TrainingScreen />}
         {active === 'datos' && <MyDataScreen userId={profile.id} />}
       </main>
       <nav className="tabbar" aria-label="Secciones">

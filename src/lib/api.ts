@@ -29,7 +29,7 @@ export async function saveDetails(d: Details): Promise<void> {
 }
 
 // ---------- Ejercicios y programación (entrenador) ----------
-import type { Exercise, Item, Week } from './helpers'
+import type { Exercise, Item, Week, ProgWeek, SessionLog, SetRow } from './helpers'
 
 type Res<T> = { data: T | null; error: { message: string } | null }
 
@@ -59,7 +59,7 @@ export async function loadWeeks(clientId: string): Promise<Week[]> {
   const data = await ok<Week[]>(
     supabase
       .from('program_weeks')
-      .select('id, week_number, program_sessions(id, position, title, program_items(id, position, exercise_id, sets, reps, weight_kg, note, item_variants(id, exercise_id)))')
+      .select('id, week_number, visible, program_sessions(id, position, title, program_items(id, position, exercise_id, sets, reps, weight_kg, note, item_variants(id, exercise_id)))')
       .eq('client_id', clientId)
       .order('week_number')
   )
@@ -115,3 +115,29 @@ export async function saveItem(sessionId: string, position: number, input: ItemI
 }
 
 export const deleteItem = (id: string) => done(supabase.from('program_items').delete().eq('id', id))
+
+export const setWeekVisible = (id: string, visible: boolean) =>
+  done(supabase.from('program_weeks').update({ visible }).eq('id', id))
+
+// ---------- Cliente: programa y entrenos ----------
+const LOG_COLS = 'id, session_id, scheduled_date, status, feeling, feeling_note'
+
+export const myProgram = () => rpc<ProgWeek[]>('my_program')
+export const myLogs = () => ok<SessionLog[]>(supabase.from('session_logs').select(LOG_COLS))
+
+export type LogPatch = { scheduled_date?: string | null; status?: 'planned' | 'done'; feeling?: number | null; feeling_note?: string | null; completed_at?: string | null }
+
+export const upsertLog = (sessionId: string, patch: LogPatch) =>
+  ok<SessionLog>(
+    supabase.from('session_logs').upsert({ session_id: sessionId, ...patch }, { onConflict: 'client_id,session_id' }).select(LOG_COLS).single()
+  )
+
+export const loadSetLogs = (logId: string) =>
+  ok<(SetRow & { id: string })[]>(
+    supabase.from('set_logs').select('id, item_id, exercise_id, set_number, prescribed_reps, prescribed_weight, reps_done, weight_done, done').eq('session_log_id', logId).order('set_number')
+  )
+
+export const saveSetLogs = (logId: string, rows: SetRow[]) =>
+  done(supabase.from('set_logs').upsert(rows.map(r => ({ ...r, session_log_id: logId })), { onConflict: 'session_log_id,item_id,set_number' }))
+
+export const deleteSetLog = (id: string) => done(supabase.from('set_logs').delete().eq('id', id))

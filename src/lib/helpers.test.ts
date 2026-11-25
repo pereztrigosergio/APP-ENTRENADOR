@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { normalizePublicId, friendlyError, ageFromBirthDate, parseReps, describeItem } from './helpers'
+import { normalizePublicId, friendlyError, ageFromBirthDate, parseReps, describeItem, firstNumber, buildSetRows, toUi, fromUi } from './helpers'
 
 describe('normalizePublicId', () => {
   it('acepta con o sin # y en minúsculas', () => {
@@ -58,5 +58,24 @@ describe('friendlyError extra', () => {
   it('traduce ejercicio en uso y duplicados', () => {
     expect(friendlyError('violates foreign key constraint')).toContain('en uso')
     expect(friendlyError('duplicate key value')).toBe('Eso ya existe')
+  })
+})
+
+describe('serie a serie', () => {
+  const item = { id: 'i1', position: 1, exercise_id: 'e1', exercise_name: 'Sentadilla', sets: 3, reps: '8-10', weight_kg: 60, note: null, variants: [] }
+  it('firstNumber toma el primer número', () => {
+    expect(firstNumber('8-10')).toBe(8)
+    expect(firstNumber('12')).toBe(12)
+  })
+  it('buildSetRows crea una fila por serie con lo prescrito', () => {
+    const rows = buildSetRows([item])
+    expect(rows).toHaveLength(3)
+    expect(rows[2]).toMatchObject({ set_number: 3, prescribed_reps: '8-10', prescribed_weight: 60, reps_done: 8, weight_done: 60, done: false })
+  })
+  it('fromUi acepta coma decimal y vacíos', () => {
+    const ui = toUi(buildSetRows([item])[0])
+    expect(fromUi({ ...ui, weightStr: '62,5', repsStr: '9' })).toMatchObject({ reps_done: 9, weight_done: 62.5 })
+    expect(fromUi({ ...ui, weightStr: '', repsStr: '' })).toMatchObject({ reps_done: null, weight_done: null })
+    expect('repsStr' in fromUi(ui)).toBe(false)
   })
 })
