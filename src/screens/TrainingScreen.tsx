@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { myLogs, myProgram, upsertLog } from '../lib/api'
-import type { ProgSession, ProgWeek, SessionLog } from '../lib/helpers'
+import { formatDay, todayIso, type ProgSession, type ProgWeek, type SessionLog } from '../lib/helpers'
 import SessionScreen from './SessionScreen'
 
 export default function TrainingScreen() {
@@ -39,6 +39,7 @@ export default function TrainingScreen() {
   }
 
   const week = weeks?.find(w => w.id === selected) ?? null
+  const today = todayIso()
 
   return (
     <>
@@ -46,24 +47,36 @@ export default function TrainingScreen() {
       {error && <p className="msg error" role="alert">{error}</p>}
       {weeks && weeks.length === 0 && <p className="hint">Tu entrenador aún no te ha publicado ninguna semana.</p>}
       {weeks && weeks.length > 0 && (
-        <div className="weekbar">
+        <div className="wk">
           {weeks.map(w => (
-            <button key={w.id} aria-pressed={w.id === selected} onClick={() => setSelected(w.id)}>Semana {w.week_number}</button>
+            <button key={w.id} aria-current={w.id === selected ? 'true' : undefined} onClick={() => setSelected(w.id)}>Semana {w.week_number}</button>
           ))}
         </div>
       )}
-      {week && <p className="lead">Elige el día que quieras para cada sesión.</p>}
       {week?.sessions.map(s => {
         const log = logs.find(l => l.session_id === s.id)
+        const date = log?.scheduled_date ?? null
         const isDone = log?.status === 'done'
+        const dateInput = (
+          <input type="date" aria-label={'Día de ' + s.title} value={date ?? ''} onChange={e => setDate(s, e.target.value)} />
+        )
         return (
-          <div className="card" key={s.id}>
-            <p className="card-main">{s.title} {isDone && <span className="chip">Hecha</span>}</p>
-            <p className="small-text muted">{s.items.length} ejercicio{s.items.length === 1 ? '' : 's'}</p>
-            <label className="datefield">Día
-              <input type="date" value={log?.scheduled_date ?? ''} onChange={e => setDate(s, e.target.value)} />
-            </label>
-            <button className={'small ' + (isDone ? '' : 'primary')} onClick={() => setOpen(s)}>{isDone ? 'Ver' : 'Entrenar'}</button>
+          <div className="srow" key={s.id}>
+            <div>
+              <button className="srow-title" onClick={() => setOpen(s)}>{s.title}</button>
+              <div className="srow-meta">
+                {s.items.length} ejercicio{s.items.length === 1 ? '' : 's'} ·{' '}
+                {date === today && !isDone && <span className="today">Hoy</span>}{' '}
+                <span className="datepick">{date ? formatDay(date) : 'Sin día'}{dateInput}</span>
+              </div>
+            </div>
+            {isDone ? (
+              <button className="btn" onClick={() => setOpen(s)}><span className="donetxt">Hecha</span></button>
+            ) : date ? (
+              <button className={'btn' + (date <= today ? ' btn-main' : '')} onClick={() => setOpen(s)}>Entrenar</button>
+            ) : (
+              <span className="datepick"><span className="btn">Elegir día</span>{dateInput}</span>
+            )}
           </div>
         )
       })}

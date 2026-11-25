@@ -132,19 +132,66 @@ export function firstNumber(reps: string): number {
   return parseInt(reps.split('-')[0], 10)
 }
 
-/** Una fila por serie, ya rellenada con lo prescrito. */
-export function buildSetRows(items: ProgItem[]): SetRow[] {
+export type HistoryRow = {
+  exercise_id: string
+  set_number: number
+  reps_done: number | null
+  weight_done: number | null
+  done: boolean
+  session_log_id: string
+  completed_at: string | null
+}
+export type LastSet = { reps: number | null; weight: number | null }
+export type LastMap = Record<string, Record<number, LastSet>>
+
+/** De todo el historial, se queda con la última sesión terminada de cada ejercicio (sin contar la actual). */
+export function pickLast(rows: HistoryRow[], excludeLogId?: string): LastMap {
+  const newest: Record<string, { log: string; at: string }> = {}
+  for (const r of rows) {
+    if (!r.done || r.completed_at === null || r.session_log_id === excludeLogId) continue
+    const cur = newest[r.exercise_id]
+    if (!cur || r.completed_at > cur.at) newest[r.exercise_id] = { log: r.session_log_id, at: r.completed_at }
+  }
+  const out: LastMap = {}
+  for (const r of rows) {
+    const n = newest[r.exercise_id]
+    if (!r.done || !n || r.session_log_id !== n.log) continue
+    ;(out[r.exercise_id] ??= {})[r.set_number] = { reps: r.reps_done, weight: r.weight_done }
+  }
+  return out
+}
+
+export function describeLast(l: LastSet | undefined): string {
+  if (!l || l.reps === null) return '—'
+  return l.weight !== null ? l.reps + ' × ' + l.weight + ' kg' : l.reps + ' reps'
+}
+
+/** Una fila por serie. Se rellena con la última vez del cliente y, si no hay, con lo prescrito. */
+export function buildSetRows(items: ProgItem[], last: LastMap = {}): SetRow[] {
   const rows: SetRow[] = []
   for (const i of items) {
     for (let n = 1; n <= i.sets; n++) {
+      const l = last[i.exercise_id]?.[n]
       rows.push({
         item_id: i.id, exercise_id: i.exercise_id, set_number: n,
         prescribed_reps: i.reps, prescribed_weight: i.weight_kg,
-        reps_done: firstNumber(i.reps), weight_done: i.weight_kg, done: false
+        reps_done: l && l.reps !== null ? l.reps : firstNumber(i.reps),
+        weight_done: l && l.reps !== null ? l.weight : i.weight_kg,
+        done: false
       })
     }
   }
   return rows
+}
+
+export const todayIso = (): string => {
+  const t = new Date()
+  return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0')
+}
+
+export function formatDay(iso: string): string {
+  const [y, m, d] = iso.split('-').map(Number)
+  return new Date(y, m - 1, d).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' }).replace(/[.,]/g, '')
 }
 
 export function toUi(r: SetRow): UiRow {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { normalizePublicId, friendlyError, ageFromBirthDate, parseReps, describeItem, firstNumber, buildSetRows, toUi, fromUi } from './helpers'
+import { normalizePublicId, friendlyError, ageFromBirthDate, parseReps, describeItem, firstNumber, buildSetRows, toUi, fromUi, pickLast, describeLast, type HistoryRow } from './helpers'
 
 describe('normalizePublicId', () => {
   it('acepta con o sin # y en minúsculas', () => {
@@ -77,5 +77,34 @@ describe('serie a serie', () => {
     expect(fromUi({ ...ui, weightStr: '62,5', repsStr: '9' })).toMatchObject({ reps_done: 9, weight_done: 62.5 })
     expect(fromUi({ ...ui, weightStr: '', repsStr: '' })).toMatchObject({ reps_done: null, weight_done: null })
     expect('repsStr' in fromUi(ui)).toBe(false)
+  })
+})
+
+describe('última vez', () => {
+  const h = (log: string, at: string | null, set: number, reps: number, w: number, done = true): HistoryRow =>
+    ({ exercise_id: 'e1', set_number: set, reps_done: reps, weight_done: w, done, session_log_id: log, completed_at: at })
+  const rows = [
+    h('A', '2026-11-10T10:00:00+00:00', 1, 8, 55), h('A', '2026-11-10T10:00:00+00:00', 2, 8, 55),
+    h('B', '2026-11-17T10:00:00+00:00', 1, 8, 60), h('B', '2026-11-17T10:00:00+00:00', 2, 7, 60),
+    h('B', '2026-11-17T10:00:00+00:00', 3, 6, 60, false)
+  ]
+  it('usa la sesión terminada más reciente y solo series hechas', () => {
+    const last = pickLast(rows)
+    expect(last.e1[1]).toEqual({ reps: 8, weight: 60 })
+    expect(last.e1[2]).toEqual({ reps: 7, weight: 60 })
+    expect(last.e1[3]).toBeUndefined()
+  })
+  it('ignora la sesión actual', () => {
+    expect(pickLast(rows, 'B').e1[1]).toEqual({ reps: 8, weight: 55 })
+  })
+  it('buildSetRows rellena con la última vez y, si no hay, con la pauta', () => {
+    const item = { id: 'i1', position: 1, exercise_id: 'e1', exercise_name: 'X', sets: 3, reps: '8-10', weight_kg: 50, note: null, variants: [] }
+    const r = buildSetRows([item], pickLast(rows))
+    expect(r[1]).toMatchObject({ reps_done: 7, weight_done: 60 })
+    expect(r[2]).toMatchObject({ reps_done: 8, weight_done: 50 })
+  })
+  it('describeLast', () => {
+    expect(describeLast({ reps: 8, weight: 60 })).toBe('8 × 60 kg')
+    expect(describeLast(undefined)).toBe('—')
   })
 })

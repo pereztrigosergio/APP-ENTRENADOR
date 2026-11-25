@@ -29,7 +29,7 @@ export async function saveDetails(d: Details): Promise<void> {
 }
 
 // ---------- Ejercicios y programación (entrenador) ----------
-import type { Exercise, Item, Week, ProgWeek, SessionLog, SetRow } from './helpers'
+import type { Exercise, Item, Week, ProgWeek, SessionLog, SetRow, HistoryRow } from './helpers'
 
 type Res<T> = { data: T | null; error: { message: string } | null }
 
@@ -141,3 +141,28 @@ export const saveSetLogs = (logId: string, rows: SetRow[]) =>
   done(supabase.from('set_logs').upsert(rows.map(r => ({ ...r, session_log_id: logId })), { onConflict: 'session_log_id,item_id,set_number' }))
 
 export const deleteSetLog = (id: string) => done(supabase.from('set_logs').delete().eq('id', id))
+
+type RawHistory = {
+  exercise_id: string; set_number: number; reps_done: number | null; weight_done: number | null
+  done: boolean; session_log_id: string
+  session_logs: { completed_at: string | null } | { completed_at: string | null }[] | null
+}
+
+export async function loadHistory(exerciseIds: string[]): Promise<HistoryRow[]> {
+  if (exerciseIds.length === 0) return []
+  const data = await ok<RawHistory[]>(
+    supabase
+      .from('set_logs')
+      .select('exercise_id, set_number, reps_done, weight_done, done, session_log_id, session_logs!inner(status, completed_at)')
+      .in('exercise_id', exerciseIds)
+      .eq('session_logs.status', 'done')
+      .limit(1000)
+  )
+  return data.map(r => {
+    const l = Array.isArray(r.session_logs) ? r.session_logs[0] : r.session_logs
+    return {
+      exercise_id: r.exercise_id, set_number: r.set_number, reps_done: r.reps_done, weight_done: r.weight_done,
+      done: r.done, session_log_id: r.session_log_id, completed_at: l?.completed_at ?? null
+    }
+  })
+}

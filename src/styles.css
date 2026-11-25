@@ -1,11 +1,14 @@
 :root {
-  --bg: #f2f5f4; --ink: #14242b; --muted: #5b6b70; --line: #d3dcda;
-  --brand: #0f5c5c; --brand-ink: #ffffff; --tag: #f2b544; --tag-ink: #3a2a00; --danger: #b3261e;
-  --surface: #ffffff;
+  --bg: #ffffff; --surface: #ffffff; --ink: #111418; --muted: #6b7378; --line: #e7eaec; --soft: #f1f3f4;
+  --brand: #1d4ed8; --brand-ink: #ffffff; --tint: #eaf0fd; --warm: #fff1e0; --warm-ink: #9a4b00;
+  --tag: #f6a94b; --tag-ink: #3a2300; --danger: #b3261e;
   color-scheme: light dark;
 }
 @media (prefers-color-scheme: dark) {
-  :root { --bg: #0f1a1d; --ink: #e8efee; --muted: #9db0b3; --line: #27393d; --brand: #3fb5aa; --brand-ink: #062b2b; --surface: #16262a; --danger: #ff8a80; }
+  :root {
+    --bg: #101418; --surface: #171c22; --ink: #eceff1; --muted: #9aa5ab; --line: #2a3138; --soft: #1e252c;
+    --brand: #7aa2ff; --brand-ink: #0b1633; --tint: #1a2640; --warm: #3a2a14; --warm-ink: #ffc27a; --danger: #ff8a80;
+  }
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
@@ -107,3 +110,49 @@ select { font: inherit; padding: 12px; border: 1.5px solid var(--line); border-r
 .faces button { display: grid; gap: 2px; justify-items: center; padding: 10px 2px; font: inherit; border: 1.5px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); cursor: pointer; }
 .faces button[aria-pressed="true"] { border-color: var(--brand); background: var(--brand); color: var(--brand-ink); font-weight: 700; }
 .face { font-size: 1.6rem; line-height: 1; }
+
+/* ---------- Pantallas del cliente (estilo sobrio) ---------- */
+.wk { display: flex; gap: 20px; border-bottom: 1px solid var(--line); margin: 8px -20px 0; padding: 0 20px; }
+.wk button { height: 44px; border: 0; border-bottom: 2px solid transparent; background: none; color: var(--muted); font: inherit; cursor: pointer; }
+.wk button[aria-current="true"] { border-bottom-color: var(--brand); color: var(--ink); font-weight: 600; }
+.srow { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 72px; border-bottom: 1px solid var(--line); margin: 0 -20px; padding: 0 20px; }
+.srow-title { background: none; border: 0; padding: 0; font: inherit; font-weight: 600; text-align: left; color: var(--ink); cursor: pointer; }
+.srow-meta { font-size: 0.8rem; color: var(--muted); }
+.today { padding: 1px 6px; border-radius: 6px; background: var(--warm); color: var(--warm-ink); font-weight: 600; }
+.datepick { position: relative; display: inline-block; }
+.datepick input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; padding: 0; font-size: 16px; }
+.btn { height: 44px; padding: 0 16px; border: 0; border-radius: 8px; background: var(--soft); color: var(--ink); font: inherit; font-weight: 600; cursor: pointer; display: inline-grid; place-items: center; }
+.btn-main { background: var(--brand); color: var(--brand-ink); }
+.donetxt { color: var(--brand); }
+.sv { position: fixed; inset: 0; z-index: 5; background: var(--bg); overflow-y: auto; padding-bottom: calc(env(safe-area-inset-bottom) + 24px); }
+.sv-inner { max-width: 420px; margin: 0 auto; }
+.sv-top { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; min-height: 52px; padding: env(safe-area-inset-top) 8px 0 4px; background: var(--bg); border-bottom: 1px solid var(--line); }
+.sv-top h1 { font-size: 1rem; font-weight: 600; margin: 0; }
+.iconbtn { width: 44px; height: 44px; border: 0; background: none; color: var(--ink); display: grid; place-items: center; cursor: pointer; }
+.textbtn { height: 44px; padding: 0 12px; border: 0; background: none; color: var(--brand); font: inherit; font-weight: 600; cursor: pointer; }
+.ex { border-top: 1px solid var(--line); }
+.sv-top + .ex, .sv-top + .msg + .ex { border-top: 0; }
+.ex-head { width: 100%; display: flex; align-items: center; justify-content: space-between; min-height: 56px; padding: 8px 16px; border: 0; background: none; font: inherit; color: var(--muted); text-align: left; cursor: pointer; }
+.ex-name { display: block; font-size: 1.05rem; font-weight: 600; color: var(--brand); }
+.ex-meta { display: block; font-size: 0.8rem; color: var(--muted); }
+.ex-info { padding: 0 16px 8px; display: grid; gap: 8px; }
+.vbar { display: flex; flex-wrap: wrap; gap: 6px; }
+.vbar button { height: 36px; padding: 0 12px; border: 0; border-radius: 8px; background: var(--soft); color: var(--ink); font: inherit; font-size: 0.85rem; cursor: pointer; }
+.vbar button[aria-pressed="true"] { background: var(--brand); color: var(--brand-ink); font-weight: 600; }
+.nota { padding: 8px 10px; border-radius: 8px; background: var(--warm); font-size: 0.85rem; }
+.nota b { color: var(--warm-ink); }
+.sets-head, .set { display: grid; grid-template-columns: 36px 1fr 68px 68px 44px; gap: 8px; align-items: center; padding: 4px 16px; }
+.sets-head { font-size: 0.68rem; letter-spacing: 0.04em; color: var(--muted); padding-top: 6px; padding-bottom: 6px; }
+.sets-head span:nth-child(3), .sets-head span:nth-child(4) { text-align: center; }
+.set.done { background: var(--tint); }
+.setn { font-weight: 600; color: var(--muted); }
+.set.done .setn { color: var(--brand); }
+.last { font-size: 0.8rem; color: var(--muted); }
+.linkbtn { justify-self: start; border: 0; background: none; padding: 0; font: inherit; font-size: 0.8rem; color: var(--danger); text-decoration: underline; cursor: pointer; }
+.set input { height: 44px; width: 100%; min-width: 0; padding: 0; border: 0; border-radius: 8px; background: var(--soft); text-align: center; font: inherit; font-weight: 500; color: var(--muted); }
+.set input:focus { color: var(--ink); }
+.set.done input { background: transparent; color: var(--ink); font-weight: 700; }
+.chk { width: 44px; height: 44px; border: 0; border-radius: 8px; background: var(--soft); color: var(--muted); display: grid; place-items: center; cursor: pointer; }
+.set.done .chk { background: var(--brand); color: var(--brand-ink); }
+.hintline { margin: 4px 16px 0; font-size: 0.75rem; color: var(--muted); }
+.addset { display: block; width: calc(100% - 32px); height: 44px; margin: 8px 16px 8px; border: 0; border-radius: 8px; background: var(--soft); color: var(--ink); font: inherit; font-weight: 600; cursor: pointer; }
