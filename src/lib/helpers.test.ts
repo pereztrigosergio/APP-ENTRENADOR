@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { normalizePublicId, friendlyError, ageFromBirthDate } from './helpers'
+import { normalizePublicId, friendlyError, ageFromBirthDate, parseReps, describeItem } from './helpers'
 
 describe('normalizePublicId', () => {
   it('acepta con o sin # y en minúsculas', () => {
@@ -29,5 +29,34 @@ describe('ageFromBirthDate', () => {
   })
   it('cuenta el año si ya cumplió', () => {
     expect(ageFromBirthDate('2000-06-15', today)).toBe(26)
+  })
+})
+
+describe('parseReps', () => {
+  it('acepta número fijo y rango', () => {
+    expect(parseReps('8')).toBe('8')
+    expect(parseReps(' 8 - 10 ')).toBe('8-10')
+    expect(parseReps('8–10')).toBe('8-10')
+  })
+  it('rechaza valores inválidos', () => {
+    expect(parseReps('')).toBeNull()
+    expect(parseReps('10-8')).toBeNull()
+    expect(parseReps('0')).toBeNull()
+    expect(parseReps('ocho')).toBeNull()
+    expect(parseReps('8-')).toBeNull()
+  })
+})
+
+describe('describeItem', () => {
+  it('muestra series, reps y kilos', () => {
+    expect(describeItem({ sets: 4, reps: '8-10', weight_kg: 60 })).toBe('4 × 8-10 · 60 kg')
+    expect(describeItem({ sets: 3, reps: '12', weight_kg: null })).toBe('3 × 12')
+  })
+})
+
+describe('friendlyError extra', () => {
+  it('traduce ejercicio en uso y duplicados', () => {
+    expect(friendlyError('violates foreign key constraint')).toContain('en uso')
+    expect(friendlyError('duplicate key value')).toBe('Eso ya existe')
   })
 })

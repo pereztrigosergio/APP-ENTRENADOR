@@ -73,3 +73,23 @@ textarea { font: inherit; padding: 12px; border: 1.5px solid var(--line); border
 .dialog h2 { margin: 0; font-size: 1.15rem; }
 .dialog p { margin: 0; color: var(--muted); }
 .actions.end { justify-content: flex-end; }
+.small-text { margin: 0; font-size: 0.9rem; }
+.card.row { grid-template-columns: 1fr auto; align-items: center; justify-items: stretch; }
+.card.row .card-main { margin: 0; }
+.back { margin: 0 0 8px; padding: 0; }
+.weekbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.weekbar button { padding: 8px 14px; font: inherit; border: 1.5px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); cursor: pointer; }
+.weekbar button[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); font-weight: 700; }
+.weekbar .add { border-style: dashed; color: var(--muted); }
+.actions.wrap { flex-wrap: wrap; margin-bottom: 12px; }
+.prev { margin: 8px 0 16px; padding: 10px 12px; border: 1.5px dashed var(--line); border-radius: 10px; }
+.prev summary { cursor: pointer; color: var(--muted); }
+.prev-session { margin-top: 10px; display: grid; gap: 2px; }
+.session { margin: 16px 0; padding: 14px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--surface); display: grid; gap: 12px; justify-items: start; }
+.session-head { display: grid; grid-template-columns: 1fr auto; gap: 8px; width: 100%; }
+.item { padding: 10px 0; border-top: 1.5px solid var(--line); display: grid; gap: 6px; width: 100%; }
+.note { margin: 0; padding: 6px 10px; border-left: 3px solid var(--tag); background: var(--bg); font-size: 0.92rem; }
+.itemform { display: grid; gap: 12px; width: 100%; padding: 12px; border: 1.5px solid var(--brand); border-radius: 10px; }
+.trio { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.trio input { width: 100%; min-width: 0; }
+select { font: inherit; padding: 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); }

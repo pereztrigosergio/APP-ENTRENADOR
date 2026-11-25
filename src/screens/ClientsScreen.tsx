@@ -18,7 +18,7 @@ function SharedData({ r }: { r: ClientRow }) {
   )
 }
 
-export default function ClientsScreen() {
+export default function ClientsScreen({ onProgram }: { onProgram: (c: { id: string; name: string }) => void }) {
   const [rows, setRows] = useState<ClientRow[] | null>(null)
   const [idInput, setIdInput] = useState('')
   const [msg, setMsg] = useState<{ kind: 'error' | 'info'; text: string } | null>(null)
@@ -91,6 +91,9 @@ export default function ClientsScreen() {
           <div className="card" key={r.link_id}>
             <p className="card-main">{r.name} <span className="muted">{r.public_id}</span></p>
             {r.status === 'pending' ? <p className="chip">Pendiente de aceptar</p> : <SharedData r={r} />}
+            {r.status === 'accepted' && (
+              <button className="small primary" onClick={() => onProgram({ id: r.client_id, name: r.name })}>Programa</button>
+            )}
             <button className="small danger" onClick={() => remove(r)}>{r.status === 'pending' ? 'Cancelar solicitud' : 'Quitar cliente'}</button>
           </div>
         ))}
