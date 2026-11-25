@@ -148,7 +148,7 @@ select { font: inherit; padding: 12px; border: 1.5px solid var(--line); border-r
 .setn { font-weight: 600; color: var(--muted); }
 .set.done .setn { color: var(--brand); }
 .last { font-size: 0.8rem; color: var(--muted); }
-.linkbtn { justify-self: start; border: 0; background: none; padding: 0; font: inherit; font-size: 0.8rem; color: var(--danger); text-decoration: underline; cursor: pointer; }
+.rmbtn { justify-self: start; width: 44px; height: 44px; border: 0; border-radius: 8px; background: transparent; color: var(--danger); display: grid; place-items: center; cursor: pointer; }
 .set input { height: 44px; width: 100%; min-width: 0; padding: 0; border: 0; border-radius: 8px; background: var(--soft); text-align: center; font: inherit; font-weight: 500; color: var(--muted); }
 .set input:focus { color: var(--ink); }
 .set.done input { background: transparent; color: var(--ink); font-weight: 700; }

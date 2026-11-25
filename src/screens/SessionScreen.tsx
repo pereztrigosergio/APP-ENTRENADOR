@@ -18,7 +18,7 @@ export default function SessionScreen({ session, log: initialLog, onBack }: { se
   const [log, setLog] = useState<SessionLog | null>(initialLog)
   const [rows, setRows] = useState<Row[] | null>(null)
   const [last, setLast] = useState<LastMap>({})
-  const [openId, setOpenId] = useState<string | null>(null)
+  const [openIds, setOpenIds] = useState<string[]>([])
   const [msg, setMsg] = useState<{ kind: 'error' | 'info'; text: string } | null>(null)
   const [busy, setBusy] = useState(false)
   const [finishing, setFinishing] = useState(false)
@@ -36,7 +36,7 @@ export default function SessionScreen({ session, log: initialLog, onBack }: { se
         setLast(pickLast(hist, initialLog?.id))
         setRows(r)
         const firstPending = session.items.find(i => r.some(x => x.item_id === i.id && !x.done))
-        setOpenId((firstPending ?? session.items[0])?.id ?? null)
+        setOpenIds([(firstPending ?? session.items[0])?.id].filter((x): x is string => !!x))
       })
       .catch(fail)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -147,12 +147,12 @@ export default function SessionScreen({ session, log: initialLog, onBack }: { se
           const chosen = itemRows[0]?.exercise_id ?? item.exercise_id
           const options = [{ exercise_id: item.exercise_id, name: item.exercise_name }, ...item.variants]
           const name = options.find(o => o.exercise_id === chosen)?.name ?? item.exercise_name
-          const isOpen = openId === item.id
+          const isOpen = openIds.includes(item.id)
           const doneCount = itemRows.filter(r => r.done).length
           const pauta = item.sets + ' × ' + item.reps + (item.weight_kg !== null ? ' · ' + item.weight_kg + ' kg' : '')
           return (
             <section className="ex" key={item.id}>
-              <button className="ex-head" aria-expanded={isOpen} onClick={() => setOpenId(isOpen ? null : item.id)}>
+              <button className="ex-head" aria-expanded={isOpen} onClick={() => setOpenIds(ids => (ids.includes(item.id) ? ids.filter(x => x !== item.id) : [...ids, item.id]))}>
                 <span>
                   <span className="ex-name">{name}</span>
                   <span className="ex-meta">{isOpen ? 'Pauta ' + pauta : doneCount + '/' + itemRows.length + ' series · ' + pauta}</span>
@@ -176,7 +176,9 @@ export default function SessionScreen({ session, log: initialLog, onBack }: { se
                     <div className={'set' + (r.done ? ' done' : '')} key={r.set_number}>
                       <span className="setn">{r.set_number}</span>
                       {r.prescribed_reps === null
-                        ? <button className="linkbtn" onClick={() => removeExtra(r)}>Quitar</button>
+                        ? <button className="rmbtn" aria-label={'Quitar serie ' + r.set_number} onClick={() => removeExtra(r)}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+                          </button>
                         : <span className="last">{describeLast(last[r.exercise_id]?.[r.set_number])}</span>}
                       <input inputMode="numeric" aria-label={'Repeticiones serie ' + r.set_number} value={r.repsStr} onChange={e => update(r, { repsStr: e.target.value })} />
                       <input inputMode="decimal" aria-label={'Kilos serie ' + r.set_number} value={r.weightStr} onChange={e => update(r, { weightStr: e.target.value })} />
